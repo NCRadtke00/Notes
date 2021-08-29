@@ -1,14 +1,45 @@
 import { ActionCreators } from "../redux/notesReducer";
+import * as axios from "axios";
+
+const axiosInstance = axios.create({
+  baseURL: "https://localhost:5001/notes",
+});
 
 export const GetNotes = async (dispatch) => {
   try {
-    const response = [
-      { value: "study for MGP in 6 days", id: 1 },
-      { value: "review c# and .net 3.1", id: 2 },
-      { value: "build 2 more fullstack projects", id: 3 },
-      { value: "Solve more problems", id: 4 },
-    ];
-    dispatch(ActionCreators.setNotes(response));
+    // api call
+    const { data } = await axiosInstance.get();
+    dispatch(ActionCreators.setNotes(data));
+  } catch {
+    console.log("Error!");
+  }
+};
+
+export const DeleteNote = async (dispatch, note) => {
+  try {
+    // api call
+    await axiosInstance.delete(`/${note.id}`);
+    dispatch(ActionCreators.deleteNote(note));
+  } catch {
+    console.log("Error!");
+  }
+};
+
+export const NewNote = async (dispatch, note) => {
+  try {
+    // api call
+    const { data } = await axiosInstance.post("", note);
+    dispatch(ActionCreators.newNote(data));
+  } catch {
+    console.log("Error!");
+  }
+};
+
+export const EditNote = async (dispatch, note) => {
+  try {
+    // api call
+    await axiosInstance.put("", note);
+    dispatch(ActionCreators.editNote(note));
   } catch {
     console.log("Error!");
   }
