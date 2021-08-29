@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,10 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Notes.Core;
+using Notes.DB;
 
 namespace Notes.WebApi
 {
@@ -26,6 +28,21 @@ namespace Notes.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddDbContext<AppDbContext>();
+
+            services.AddTransient<INotesServices, NotesServices>();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("NotesPolicy",
+                builder =>
+                {
+                    builder.WithOrigins("*")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +56,8 @@ namespace Notes.WebApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("NotesPolicy");
 
             app.UseAuthorization();
 
